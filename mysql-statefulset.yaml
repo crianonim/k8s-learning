@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mysql
+  name: mysql
+spec:
+  replicas: 1
+  serviceName: mysql
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - image: mariadb:10.5
+        name: mariadb
+        ports:
+          - containerPort: 3306
+            name: mysql
+            protocol: TCP
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: db-pass
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+
+          
